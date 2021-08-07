@@ -58,15 +58,8 @@ const login=(req,acno,password)=>{
   }
 }
 
-const deposit=(req,acno,password,amount)=>{
+const deposit=(acno,password,amount)=>{
   var amt=parseInt(amount)
-  if(!req.session.currentAcc){
-    return {
-      statusCode:422,
-      status:false,
-      message:"Pls login"
-    }
-  }
  
   if(acno in users){
     if(password == users[acno]["password"]){
@@ -141,9 +134,19 @@ const withdrawal=(acno,pwd,amount)=>{
   }
 }
 
+const getTransaction=(req)=>{
+  // let balance=this.users[this.currentUser]["balance"]
+  return {
+    statusCode:200,
+    status:true,
+    transaction:users[req.session.currentAcc].transaction
+    }
+}
+
 module.exports={
     register,
     login,
     deposit,
-    withdrawal
+    withdrawal,
+    getTransaction
 }
