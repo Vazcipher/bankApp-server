@@ -9,10 +9,11 @@ app.use(session({
     saveUninitialized:false
 }))
 
-app.use((req,res,next)=>{
-    console.log("Application specific middleware");
-    next()
-})
+//Application specific middleware
+// app.use((req,res,next)=>{
+//     console.log("Application specific middleware");
+//     next()
+// })
 
 //root specific middleware
 const authMiddleware = (req,res,next)=>{
@@ -49,32 +50,37 @@ app.delete('/delete',(req,res)=>{
 
 app.post('/register',(req,res)=>{
     console.log(req.body);
-    
-    const result=dataService.register(req.body.acno,req.body.username,req.body.password)
-    res.status(result.statusCode).json(result)
+    dataService.register(req.body.acno,req.body.username,req.body.password)
+    .then(result=>{
+        res.status(result.statusCode).json(result)
+    })
 })
 
 app.post('/deposit',authMiddleware,(req,res)=>{
     console.log(req.body);
     // console.log(req.session.currentAcc);
-    const result=dataService.deposit(req.body.acno,req.body.password,req.body.amount)
-    res.status(result.statusCode).json(result)
+    dataService.deposit(req.body.acno,req.body.password,req.body.amount).then(result=>{
+        res.status(result.statusCode).json(result)
+    })
 })
 app.post('/withdrawal',authMiddleware,(req,res)=>{
     console.log(req.body);
-    const result=dataService.withdrawal(req.body.acno,req.body.password,req.body.amount)
-    res.status(result.statusCode).json(result)
+    dataService.withdrawal(req,req.body.acno,req.body.password,req.body.amount).then(result=>{
+        res.status(result.statusCode).json(result)
+    })
 })
 
 app.post('/login',(req,res)=>{
-    const result=dataService.login(req,req.body.acno,req.body.pwd)
-    res.status(result.statusCode).json(result)
-    console.log(req.session.currentAcc);
+    dataService.login(req,req.body.acno,req.body.pwd).then(result=>{
+        res.status(result.statusCode).json(result)
+        console.log(req.session.currentAcc);
+    })
 })
 
 app.post('/getTransaction',authMiddleware,(req,res)=>{
-    const result=dataService.getTransaction(req)
-    res.status(result.statusCode).json(result)
+    dataService.getTransaction(req).then(result=>{
+        res.status(result.statusCode).json(result)
+    })
 })
 
 // app.get('/getTraining',(req,res)=>{
