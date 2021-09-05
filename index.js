@@ -1,7 +1,13 @@
 const express=require('express')
 const dataService=require('./services/data.service')
 const session=require('express-session')
+const cors=require('cors')
 const app = express()
+
+app.use(cors({
+    origin:'http://localhost:4200',
+    credentials:true
+}))
 
 app.use(session({
     secret:"rendomstring",
@@ -16,7 +22,7 @@ app.use(session({
 // })
 
 //root specific middleware
-const authMiddleware = (req,res,next)=>{
+const authMiddleware = (req,res,next)=>{      
     if(!req.session.currentAcc){
         res.json({
           statusCode:422,
@@ -78,21 +84,16 @@ app.post('/login',(req,res)=>{
 })
 
 app.post('/getTransaction',authMiddleware,(req,res)=>{
-    dataService.getTransaction(req).then(result=>{
+    dataService.getTransaction(req.body.acno).then(result=>{
         res.status(result.statusCode).json(result)
     })
 })
 
-// app.get('/getTraining',(req,res)=>{
-
-//     trainingObj={
-//         tariningId:2,
-//         name:"vasif",
-//         active:true
-//     }
-
-//     res.send(trainingObj)
-// })
+app.delete('/deleteAcc/:acno',authMiddleware,(req,res)=>{
+    dataService.deleteAcc(req.params.acno).then(result=>{
+        res.status(result.statusCode).json(result)
+    })
+})
 
 app.listen(3000,()=>{
     console.log("Server started at:3000");

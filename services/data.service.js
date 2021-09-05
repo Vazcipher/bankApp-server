@@ -26,7 +26,7 @@ users = {
               balance:0,
               transaction:[]
         })
-        newUser.save()
+        newUser.save()  
         return {
                   statusCode:200,
                   status:true,
@@ -46,7 +46,9 @@ const login=(req,acno,password)=>{
       return {
         statusCode:200,
         status:true,
-        message:"Login successfull"
+        message:"Login successfull",
+        userName:user.username,
+        currentAcc:user.acno
       }
     }
       return {
@@ -126,15 +128,16 @@ const withdrawal=(req,acno,pwd,amount)=>{
   })
 }
 
-const getTransaction=(req)=>{
+const getTransaction=(acno)=>{
   // let balance=this.users[this.currentUser]["balance"]
 
-  return db.User.findOne({acno:req.session.currentAcc}).then(user=>{
+  return db.User.findOne({acno}).then(user=>{
     if(user){
       return {
         statusCode:200,
         status:true,
-        transaction:user.transaction
+        transaction:user.transaction,
+        balance:user.balance
       }
     }
     else{
@@ -147,10 +150,28 @@ const getTransaction=(req)=>{
   })
 }
 
+const deleteAcc=(acno)=>{
+    return db.User.deleteOne({acno}).then(result=>{
+      if(!result){
+        return {
+          statusCode:422,
+          status:false,
+          message:"Invalid Operation"
+        }
+      }
+      return {
+        statusCode:200,
+        status:true,
+        message:"Successfully Deleted"
+      }
+    })
+}
+
 module.exports={
     register,
     login,
     deposit,
     withdrawal,
-    getTransaction
+    getTransaction,
+    deleteAcc
 }
